@@ -38,14 +38,10 @@ jobs:
     - name: Setup kubectl
       uses: azure/setup-kubectl@v3
     
-   # Step 5: Deploy to Kubernetes
-- name: Deploy to Kubernetes
-  run: |
-    # Apply Kubernetes manifests
-kubectl apply -f k8s/ --validate=false        # Wait for deployment to be ready
-        kubectl rollout status deployment/devops-app
-        # Show deployment status
-        kubectl get pods -l app=devops-app
-      env:
-        # Kubernetes config should be available (set as secret in GitHub)
-        KUBECONFIG: ${{ secrets.KUBECONFIG }}
+      - name: Deploy to Kubernetes
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+        run: |
+          kubectl apply -f k8s/ --validate=false
+          kubectl rollout status deployment/devops-app
+          kubectl get pods -l app=devops-app
