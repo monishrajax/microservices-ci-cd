@@ -1,43 +1,28 @@
-name: CI/CD Pipeline
-
-# Trigger on push to main branch
-on:
-  push:
-    branches: [ main ]
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
-    # Step 1: Checkout code
-    - name: Checkout code
-      uses: actions/checkout@v3
-    
-    # Step 2: Build Docker image
-    - name: Build Docker image
-      run: |
-        docker build -t devops-app:${{ github.sha }} .
-        docker tag devops-app:${{ github.sha }} devops-app:latest
-    
-    # Step 3: Run basic test
-    - name: Run basic test
-      run: |
-        # Test that the Docker image can start
-        docker run -d --name test-container -p 3000:3000 devops-app:latest
-        sleep 5
-        # Check if container is running
-        docker ps | grep test-container
-        # Test the endpoint
-        curl -f http://localhost:3000 || exit 1
-        # Cleanup
-        docker stop test-container
-        docker rm test-container
-    
-    # Step 4: Setup kubectl
-    - name: Setup kubectl
-      uses: azure/setup-kubectl@v3
-    
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: |
+          docker build -t devops-app:${{ github.sha }} .
+          docker tag devops-app:${{ github.sha }} devops-app:latest
+
+      - name: Run basic test
+        run: |
+          docker run -d --name test-container -p 3000:3000 devops-app:latest
+          sleep 5
+          docker ps | grep test-container
+          curl -f http://localhost:3000 || exit 1
+          docker stop test-container
+          docker rm test-container
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+
       - name: Deploy to Kubernetes
         env:
           KUBECONFIG: ${{ secrets.KUBECONFIG }}
