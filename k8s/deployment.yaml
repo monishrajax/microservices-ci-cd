@@ -16,6 +16,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: devops-app
+        # Replaced at deploy time by CI with ghcr.io/<owner>/<repo>:<sha>
+        image: __DOCKER_IMAGE__
         ports:
         - containerPort: 3000
